@@ -55,7 +55,7 @@ function animate() {
         h.x += h.vx;
         h.y += h.vy;
 
-        ctx.fillStyle = h.color;
+        ctx.fillStyle = "#ff4d6d";
         ctx.beginPath();
         ctx.arc(h.x, h.y, h.size, 0, Math.PI * 2);
         ctx.fill();
