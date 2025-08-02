@@ -1,130 +1,130 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>💖 Gửi Em</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gửi Em 💖</title>
     <style>
-        body {
+        html, body {
             margin: 0;
+            padding: 0;
             background: #fff0f5;
-            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
+            height: 100%;
         }
-
-        .text-box {
-            font-size: 2rem;
-            color: #d6336c;
-            min-height: 3em;
-            text-align: center;
-            margin-top: 80px;
-            position: relative;
-            z-index: 2;
-        }
-
         canvas {
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
         }
     </style>
 </head>
 <body>
-
-<div class="text-box" id="textBox"></div>
 <canvas id="heartCanvas"></canvas>
 
 <script>
-    const lines = [
+    const messages = [
         "Anh biết hỏi trực tiếp hơi khó...",
         "nên anh làm thế này...",
         "Em ăn cơm chưa? 🙃"
     ];
 
-    const textBox = document.getElementById('textBox');
     const canvas = document.getElementById('heartCanvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
 
-    let currentLine = 0;
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
 
-    function typeLine(line, callback) {
-        textBox.innerHTML = "";
-        let i = 0;
-        const typing = setInterval(() => {
-            textBox.innerHTML = line.slice(0, i + 1);
-            i++;
-            if (i === line.length) {
-                clearInterval(typing);
-                setTimeout(() => {
-                    animateHeartsToText(line, callback);
-                }, 500);
-            }
-        }, 60);
-    }
+    function createHeartsFromText(text, callback) {
+        const offscreenCanvas = document.createElement('canvas');
+        const offCtx = offscreenCanvas.getContext('2d');
+        offscreenCanvas.width = width;
+        offscreenCanvas.height = height;
 
-    function animateHeartsToText(message, callback) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "bold 48px 'Segoe UI'";
-        ctx.fillStyle = "#ff4d6d";
-        ctx.textAlign = "center";
-        ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+        offCtx.font = "bold 40px Arial";
+        offCtx.textAlign = "center";
+        offCtx.fillStyle = "#000";
+        offCtx.fillText(text, width / 2, height / 2);
 
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const imageData = offCtx.getImageData(0, 0, width, height).data;
+        const hearts = [];
 
-        const particles = [];
-
-        for (let y = 0; y < imageData.height; y += 8) {
-            for (let x = 0; x < imageData.width; x += 8) {
-                const index = (y * imageData.width + x) * 4;
-                if (imageData.data[index + 3] > 150) {
-                    const startX = Math.random() * canvas.width;
-                    const startY = canvas.height + Math.random() * 100;
-                    particles.push({
-                        x: startX,
-                        y: startY,
-                        targetX: x,
-                        targetY: y,
-                        size: 10,
-                        speed: 0.05 + Math.random() * 0.05,
-                        emoji: '💖'
+        for (let y = 0; y < height; y += 10) {
+            for (let x = 0; x < width; x += 10) {
+                const index = (y * width + x) * 4;
+                if (imageData[index + 3] > 128) { // alpha channel
+                    hearts.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        tx: x,
+                        ty: y,
+                        size: 4 + Math.random() * 2,
+                        color: 'pink',
+                        vx: 0,
+                        vy: 0
                     });
                 }
             }
         }
+        callback(hearts);
+    }
 
+    function animateHearts(hearts, onComplete) {
         let frame = 0;
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let p of particles) {
-                p.x += (p.targetX - p.x) * p.speed;
-                p.y += (p.targetY - p.y) * p.speed;
-                ctx.font = `${p.size}px serif`;
-                ctx.fillText(p.emoji, p.x, p.y);
-            }
-            frame++;
-            if (frame < 60) {
-                requestAnimationFrame(draw);
-            } else {
-                setTimeout(callback, 1500);
-            }
-        }
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            let done = true;
 
-        draw();
-    }
+            hearts.forEach(h => {
+                const dx = h.tx - h.x;
+                const dy = h.ty - h.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
 
-    function runSequence() {
-        if (currentLine < lines.length) {
-            typeLine(lines[currentLine], () => {
-                currentLine++;
-                setTimeout(runSequence, 500);
+                if (dist > 1) {
+                    h.vx = dx * 0.05;
+                    h.vy = dy * 0.05;
+                    h.x += h.vx;
+                    h.y += h.vy;
+                    done = false;
+                }
+
+                ctx.beginPath();
+                ctx.fillStyle = h.color;
+                ctx.moveTo(h.x, h.y);
+                ctx.arc(h.x, h.y, h.size, 0, Math.PI * 2);
+                ctx.fill();
             });
+
+            frame++;
+            if (!done && frame < 200) {
+                requestAnimationFrame(animate);
+            } else {
+                setTimeout(() => {
+                    ctx.clearRect(0, 0, width, height);
+                    onComplete();
+                }, 2000);
+            }
         }
+        animate();
     }
 
-    runSequence();
+    let currentMessage = 0;
+    function showNextMessage() {
+        if (currentMessage >= messages.length) return;
+
+        createHeartsFromText(messages[currentMessage], (hearts) => {
+            animateHearts(hearts, () => {
+                currentMessage++;
+                showNextMessage();
+            });
+        });
+    }
+
+    showNextMessage();
 </script>
 </body>
 </html>
