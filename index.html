@@ -2,56 +2,37 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>💌 Gửi em</title>
+    <title>💖 Gửi Em</title>
     <style>
         body {
             margin: 0;
-            background: #ffeef2;
+            background: #fff0f5;
             font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             overflow: hidden;
-            position: relative;
-            flex-direction: column;
         }
 
         .text-box {
-            font-size: 1.6rem;
+            font-size: 2rem;
             color: #d6336c;
-            text-align: center;
             min-height: 3em;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+            z-index: 2;
         }
 
-        .heart {
+        canvas {
             position: absolute;
-            color: #ff4d6d;
-            font-size: 1.2rem;
-            animation: float 3s ease-in forwards;
-            pointer-events: none;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-200px) scale(1.5);
-                opacity: 0;
-            }
-        }
-
-        .typing {
-            border-right: .1em solid #d6336c;
-            white-space: nowrap;
-            overflow: hidden;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
+
 <div class="text-box" id="textBox"></div>
+<canvas id="heartCanvas"></canvas>
 
 <script>
     const lines = [
@@ -61,46 +42,89 @@
     ];
 
     const textBox = document.getElementById('textBox');
-    let lineIndex = 0;
+    const canvas = document.getElementById('heartCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    function typeLine(line, cb) {
+    let currentLine = 0;
+
+    function typeLine(line, callback) {
+        textBox.innerHTML = "";
         let i = 0;
-        textBox.classList.add('typing');
-        const interval = setInterval(() => {
+        const typing = setInterval(() => {
             textBox.innerHTML = line.slice(0, i + 1);
             i++;
             if (i === line.length) {
-                clearInterval(interval);
-                textBox.classList.remove('typing');
-                spawnHearts(10 + line.length / 2);
-                setTimeout(cb, 1200);
+                clearInterval(typing);
+                setTimeout(() => {
+                    animateHeartsToText(line, callback);
+                }, 500);
             }
-        }, 80);
+        }, 60);
     }
 
-    function spawnHearts(count) {
-        for (let i = 0; i < count; i++) {
-            const heart = document.createElement('div');
-            heart.className = 'heart';
-            heart.innerText = '💖';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.bottom = '0px';
-            heart.style.animationDuration = 2 + Math.random() * 2 + 's';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 3000);
+    function animateHeartsToText(message, callback) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 48px 'Segoe UI'";
+        ctx.fillStyle = "#ff4d6d";
+        ctx.textAlign = "center";
+        ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const particles = [];
+
+        for (let y = 0; y < imageData.height; y += 8) {
+            for (let x = 0; x < imageData.width; x += 8) {
+                const index = (y * imageData.width + x) * 4;
+                if (imageData.data[index + 3] > 150) {
+                    const startX = Math.random() * canvas.width;
+                    const startY = canvas.height + Math.random() * 100;
+                    particles.push({
+                        x: startX,
+                        y: startY,
+                        targetX: x,
+                        targetY: y,
+                        size: 10,
+                        speed: 0.05 + Math.random() * 0.05,
+                        emoji: '💖'
+                    });
+                }
+            }
         }
+
+        let frame = 0;
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let p of particles) {
+                p.x += (p.targetX - p.x) * p.speed;
+                p.y += (p.targetY - p.y) * p.speed;
+                ctx.font = `${p.size}px serif`;
+                ctx.fillText(p.emoji, p.x, p.y);
+            }
+            frame++;
+            if (frame < 60) {
+                requestAnimationFrame(draw);
+            } else {
+                setTimeout(callback, 1500);
+            }
+        }
+
+        draw();
     }
 
-    function startTyping() {
-        if (lineIndex < lines.length) {
-            typeLine(lines[lineIndex], () => {
-                lineIndex++;
-                setTimeout(startTyping, 1000);
+    function runSequence() {
+        if (currentLine < lines.length) {
+            typeLine(lines[currentLine], () => {
+                currentLine++;
+                setTimeout(runSequence, 500);
             });
         }
     }
 
-    startTyping();
+    runSequence();
 </script>
 </body>
 </html>
