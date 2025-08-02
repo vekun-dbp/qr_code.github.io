@@ -41,4 +41,59 @@
             position: absolute;
             color: pink;
             font-size: 2rem;
-            animation: float 5
+            animation: float 5s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.5);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="message" id="msg1">Anh biết...</div>
+<div class="message" id="msg2">...hỏi trực tiếp hơi khó...</div>
+<div class="message" id="msg3">...nên anh làm thế này...</div>
+<div class="message" id="msg4">Em ăn cơm chưa? 🙃</div>
+
+<div class="hearts" id="hearts"></div>
+
+<script>
+    const messages = ['msg1', 'msg2', 'msg3', 'msg4'];
+    let index = 0;
+
+    function showMessage() {
+        if (index > 0) document.getElementById(messages[index - 1]).style.opacity = 0;
+        if (index < messages.length) {
+            const el = document.getElementById(messages[index]);
+            el.style.opacity = 1;
+            index++;
+            setTimeout(showMessage, 2500);
+        }
+    }
+
+    showMessage();
+
+    // Create floating hearts
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+        heart.textContent = '💖';
+        document.getElementById('hearts').appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+    }
+
+    setInterval(createHeart, 300);
+</script>
+</body>
+</html>
