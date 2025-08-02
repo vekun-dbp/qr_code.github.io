@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Em ăn cơm chưa?</title>
+    <style>
+        body {
+            margin: 0;
+            background: #fff0f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+        .heart {
+            width: 20px;
+            height: 20px;
+            background: red;
+            position: absolute;
+            transform: rotate(45deg);
+            animation: float 4s linear infinite;
+        }
+        .heart:before, .heart:after {
+            content: "";
+            width: 20px;
+            height: 20px;
+            background: red;
+            position: absolute;
+            border-radius: 50%;
+        }
+        .heart:before {
+            top: -10px;
+            left: 0;
+        }
+        .heart:after {
+            left: -10px;
+            top: 0;
+        }
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-300px) scale(1.5);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>
+    Anh biết hỏi trực tiếp hơi khó ...<br />
+    nên anh làm thế này ...<br />
+    Em ăn cơm chưa? 🙃
+</h1>
+<script>
+    function createHeart() {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = 2 + Math.random() * 3 + "s";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+    }
+    setInterval(createHeart, 300);
+</script>
+</body>
+</html>
