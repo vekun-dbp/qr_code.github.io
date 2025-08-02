@@ -2,75 +2,105 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>❤️ Gửi em một chút dễ thương ❤️</title>
+    <title>💌 Gửi em</title>
     <style>
         body {
-            background: #fff0f5;
             margin: 0;
+            background: #ffeef2;
             font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            overflow: hidden;
+            position: relative;
             flex-direction: column;
         }
-        .text {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #ff4d6d;
-            opacity: 0;
-            animation: fadeIn 2s ease forwards;
+
+        .text-box {
+            font-size: 1.6rem;
+            color: #d6336c;
+            text-align: center;
+            min-height: 3em;
         }
+
         .heart {
             position: absolute;
             color: #ff4d6d;
-            animation: explode 1s ease-out forwards;
             font-size: 1.2rem;
+            animation: float 3s ease-in forwards;
             pointer-events: none;
         }
 
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes explode {
+        @keyframes float {
             0% {
-                transform: translate(0, 0) scale(1);
+                transform: translateY(0) scale(1);
                 opacity: 1;
             }
             100% {
-                transform: translate(var(--x), var(--y)) scale(0.5);
+                transform: translateY(-200px) scale(1.5);
                 opacity: 0;
             }
+        }
+
+        .typing {
+            border-right: .1em solid #d6336c;
+            white-space: nowrap;
+            overflow: hidden;
         }
     </style>
 </head>
 <body>
-<div class="text" id="line">Anh biết hỏi trực tiếp hơi khó... nên anh làm thế này... Em ăn cơm chưa? 🙃</div>
+<div class="text-box" id="textBox"></div>
 
 <script>
-    const line = document.getElementById('line');
+    const lines = [
+        "Anh biết hỏi trực tiếp hơi khó...",
+        "nên anh làm thế này...",
+        "Em ăn cơm chưa? 🙃"
+    ];
 
-    setTimeout(() => {
-        // bắn tim ra từ chữ
-        for (let i = 0; i < 30; i++) {
+    const textBox = document.getElementById('textBox');
+    let lineIndex = 0;
+
+    function typeLine(line, cb) {
+        let i = 0;
+        textBox.classList.add('typing');
+        const interval = setInterval(() => {
+            textBox.innerHTML = line.slice(0, i + 1);
+            i++;
+            if (i === line.length) {
+                clearInterval(interval);
+                textBox.classList.remove('typing');
+                spawnHearts(10 + line.length / 2);
+                setTimeout(cb, 1200);
+            }
+        }, 80);
+    }
+
+    function spawnHearts(count) {
+        for (let i = 0; i < count; i++) {
             const heart = document.createElement('div');
             heart.className = 'heart';
             heart.innerText = '💖';
-            const angle = Math.random() * 2 * Math.PI;
-            const radius = 100 + Math.random() * 50;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            heart.style.setProperty('--x', `${x}px`);
-            heart.style.setProperty('--y', `${y}px`);
-            heart.style.left = `${line.offsetLeft + line.offsetWidth / 2}px`;
-            heart.style.top = `${line.offsetTop + line.offsetHeight / 2}px`;
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.bottom = '0px';
+            heart.style.animationDuration = 2 + Math.random() * 2 + 's';
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
+            setTimeout(() => heart.remove(), 3000);
         }
-    }, 2000);
+    }
+
+    function startTyping() {
+        if (lineIndex < lines.length) {
+            typeLine(lines[lineIndex], () => {
+                lineIndex++;
+                setTimeout(startTyping, 1000);
+            });
+        }
+    }
+
+    startTyping();
 </script>
 </body>
 </html>
