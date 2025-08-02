@@ -21,14 +21,14 @@ body {
     top: 30%;
 }
 
-.bubble {
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    background-color: #ffd6de;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation: rise 4s linear forwards;
+#bubble-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
 }
 
 @keyframes rise {
