@@ -2,98 +2,75 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Gửi em ❤️</title>
+    <title>❤️ Gửi em một chút dễ thương ❤️</title>
     <style>
         body {
             background: #fff0f5;
+            margin: 0;
             font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            overflow: hidden;
-            margin: 0;
-            position: relative;
+            flex-direction: column;
         }
-
-        .message {
+        .text {
             font-size: 1.8rem;
-            color: #333;
+            font-weight: bold;
+            color: #ff4d6d;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
-            position: absolute;
-            text-align: center;
-            width: 80%;
+            animation: fadeIn 2s ease forwards;
         }
-
-        .hearts {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
         .heart {
             position: absolute;
-            color: pink;
-            font-size: 2rem;
-            animation: float 5s linear infinite;
-            opacity: 0.7;
+            color: #ff4d6d;
+            animation: explode 1s ease-out forwards;
+            font-size: 1.2rem;
+            pointer-events: none;
         }
 
-        @keyframes float {
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes explode {
             0% {
-                transform: translateY(100vh) scale(1);
+                transform: translate(0, 0) scale(1);
                 opacity: 1;
             }
             100% {
-                transform: translateY(-10vh) scale(1.5);
+                transform: translate(var(--x), var(--y)) scale(0.5);
                 opacity: 0;
             }
         }
     </style>
 </head>
 <body>
-
-<div class="message" id="msg1">Anh biết...</div>
-<div class="message" id="msg2">...hỏi trực tiếp hơi khó...</div>
-<div class="message" id="msg3">...nên anh làm thế này...</div>
-<div class="message" id="msg4">Em ăn cơm chưa? 🙃</div>
-
-<div class="hearts" id="hearts"></div>
+<div class="text" id="line">Anh biết hỏi trực tiếp hơi khó... nên anh làm thế này... Em ăn cơm chưa? 🙃</div>
 
 <script>
-    const messages = ['msg1', 'msg2', 'msg3', 'msg4'];
-    let index = 0;
+    const line = document.getElementById('line');
 
-    function showMessage() {
-        if (index > 0) document.getElementById(messages[index - 1]).style.opacity = 0;
-        if (index < messages.length) {
-            const el = document.getElementById(messages[index]);
-            el.style.opacity = 1;
-            index++;
-            setTimeout(showMessage, 2500);
+    setTimeout(() => {
+        // bắn tim ra từ chữ
+        for (let i = 0; i < 30; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerText = '💖';
+            const angle = Math.random() * 2 * Math.PI;
+            const radius = 100 + Math.random() * 50;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            heart.style.setProperty('--x', `${x}px`);
+            heart.style.setProperty('--y', `${y}px`);
+            heart.style.left = `${line.offsetLeft + line.offsetWidth / 2}px`;
+            heart.style.top = `${line.offsetTop + line.offsetHeight / 2}px`;
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
         }
-    }
-
-    showMessage();
-
-    // Create floating hearts
-    function createHeart() {
-        const heart = document.createElement('div');
-        heart.classList.add('heart');
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.animationDuration = (3 + Math.random() * 2) + 's';
-        heart.textContent = '💖';
-        document.getElementById('hearts').appendChild(heart);
-        setTimeout(() => heart.remove(), 5000);
-    }
-
-    setInterval(createHeart, 300);
+    }, 2000);
 </script>
 </body>
 </html>
