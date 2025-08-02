@@ -8,18 +8,19 @@ function createBubble() {
     bubble.classList.add('bubble');
     bubble.style.left = Math.random() * window.innerWidth + 'px';
     bubbleContainer.appendChild(bubble);
-
-    setTimeout(() => {
-        bubble.remove();
-    }, 4000);
+    setTimeout(() => bubble.remove(), 4000);
 }
 
 function showNextLine() {
+    lines.forEach(line => line.style.opacity = 0); // ẩn hết
     if (lineIndex >= lines.length) return;
     lines[lineIndex].style.opacity = 1;
-    lineIndex++;
-    setTimeout(showNextLine, 3000); // delay between lines
+    setTimeout(() => {
+        lines[lineIndex].style.opacity = 0;
+        lineIndex++;
+        showNextLine(); // hiển thị câu tiếp theo
+    }, 3000); // mỗi câu hiển thị 3s
 }
 
-setInterval(createBubble, 100); // generate bubbles constantly
-setTimeout(showNextLine, 2000); // start text reveal
+setInterval(createBubble, 100);
+setTimeout(showNextLine, 2000); // bắt đầu sau 2s

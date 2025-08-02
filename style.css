@@ -7,11 +7,11 @@ body {
 
 #line, .line {
     opacity: 0;
+    transition: opacity 1s ease-in-out;
     font-size: 30px;
     font-weight: bold;
     text-align: center;
     margin-top: 50px;
-    transition: opacity 1s ease-in-out;
     color: #ff4d6d;
 }
 
