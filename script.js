@@ -1,75 +1,37 @@
-const canvas = document.getElementById('heartCanvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const messages = [
-    "Anh biết hỏi trực tiếp hơi khó...",
-    "Nên anh làm thế này...",
-    "Em ăn cơm chưa? 🙃"
-];
+const textElem = document.getElementById("realText");
+const range = document.createRange();
+const hearts = [];
 
-let hearts = [];
-let currentText = 0;
+for (let i = 0; i < textElem.textContent.length; i++) {
+    const span = document.createElement("span");
+    span.textContent = textElem.textContent[i];
+    span.style.position = "absolute";
+    textElem.appendChild(span);
 
-function createHeart(x, y) {
-    return {
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        tx: x,
-        ty: y,
-        vx: 0,
-        vy: 0,
-        size: 4,
-        color: `hsl(${Math.random() * 360}, 80%, 70%)`
-    };
+    const rect = span.getBoundingClientRect();
+    const x = rect.left + window.scrollX;
+    const y = rect.top + window.scrollY;
+
+    hearts.push({ x, y, size: 8, color: "red" });
+    span.remove(); // Xong thì bỏ đi
 }
 
-function renderTextToPoints(text) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "bold 60px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    const points = [];
-
-    for (let y = 0; y < canvas.height; y += 8) {
-        for (let x = 0; x < canvas.width; x += 8) {
-            const i = (y * canvas.width + x) * 4;
-            if (imgData[i + 3] > 150) points.push({ x, y });
-        }
-    }
-    return points;
-}
-
+// Animation
+let i = 0;
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let h of hearts) {
-        const dx = h.tx - h.x;
-        const dy = h.ty - h.y;
-        h.vx += dx * 0.01;
-        h.vy += dy * 0.01;
-        h.vx *= 0.9;
-        h.vy *= 0.9;
-        h.x += h.vx;
-        h.y += h.vy;
-
-        ctx.fillStyle = "#ff4d6d";
+    if (i < hearts.length) {
+        const heart = hearts[i];
+        ctx.fillStyle = heart.color;
         ctx.beginPath();
-        ctx.arc(h.x, h.y, h.size, 0, Math.PI * 2);
+        ctx.arc(heart.x, heart.y, heart.size, 0, 2 * Math.PI);
         ctx.fill();
+        i++;
+        setTimeout(animate, 100); // từng trái tim 1
     }
-    requestAnimationFrame(animate);
 }
-
-function showNextMessage() {
-    if (currentText >= messages.length) return;
-    const points = renderTextToPoints(messages[currentText]);
-    hearts = points.map(p => createHeart(p.x, p.y));
-    currentText++;
-    setTimeout(showNextMessage, 3000);
-}
-
-showNextMessage();
 animate();

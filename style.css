@@ -1,15 +1,10 @@
-#main-text {
+#realText {
     font-size: 40px;
     font-weight: bold;
-    text-align: center;
-    margin-top: 150px;
-    color: #ff4d6d;
-    z-index: 2;
-    position: relative;
+    visibility: hidden; /* để lấy vị trí chữ thôi */
 }
 canvas {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
 }
