@@ -1,8 +1,15 @@
-body {
-    margin: 0;
-    overflow: hidden;
-    background: #ffeaf4;
+#main-text {
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 150px;
+    color: #ff4d6d;
+    z-index: 2;
+    position: relative;
 }
 canvas {
-    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
