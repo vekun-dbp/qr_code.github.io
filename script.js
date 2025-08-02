@@ -7,6 +7,7 @@ function createBubble() {
     const bubble = document.createElement('div');
     bubble.classList.add('bubble');
     bubble.style.left = Math.random() * window.innerWidth + 'px';
+    bubble.style.top = window.innerHeight + 'px';
     bubbleContainer.appendChild(bubble);
     setTimeout(() => bubble.remove(), 4000);
 }
